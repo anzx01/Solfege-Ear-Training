@@ -14,6 +14,8 @@ export function generateStaticParams() {
   return SEO_SLUGS.map((slug) => ({ slug }));
 }
 
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const page = SEO_PAGES[slug];

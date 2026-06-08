@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isCloudflarePages = process.env.CF_PAGES === "1";
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
@@ -12,9 +14,19 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
-  }
+  ...(isCloudflarePages
+    ? {
+        output: "export",
+        images: {
+          unoptimized: true
+        },
+        trailingSlash: true
+      }
+    : {
+        async headers() {
+          return [{ source: "/:path*", headers: securityHeaders }];
+        }
+      })
 };
 
 export default nextConfig;
