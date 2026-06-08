@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Footer } from "@/components/Footer";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://solfege-ear-training.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Movable Do Solfege Ear Training Online",
     template: "%s | Solfege Ear Trainer"

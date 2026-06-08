@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { SEO_SLUGS } from "@/lib/content";
+import { SITE_URL } from "@/lib/site";
 
-const baseUrl = "https://solfege-ear-training.vercel.app";
+const baseUrl = SITE_URL;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = ["", "/pricing", "/about", "/privacy", "/terms"];

@@ -5,9 +5,10 @@ import { Mail } from "lucide-react";
 
 const WAITLIST_KEY = "solfege.pro.waitlist.v1";
 const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
-const WEB3FORMS_ACCESS_KEY = "566f89c1-80c0-4fd7-97ea-f2c9aa4694fe";
+const WEB3FORMS_ACCESS_KEY =
+  process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "566f89c1-80c0-4fd7-97ea-f2c9aa4694fe";
 
-type SubmitStatus = "idle" | "invalid" | "sending" | "saved" | "failed";
+type SubmitStatus = "idle" | "invalid" | "consent" | "sending" | "saved" | "failed";
 
 function saveEmail(email: string) {
   try {
@@ -22,14 +23,28 @@ function saveEmail(email: string) {
 
 export function WaitlistForm() {
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<SubmitStatus>("idle");
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     const normalized = email.trim().toLowerCase();
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) {
       setStatus("invalid");
+      return;
+    }
+
+    if (!consent) {
+      setStatus("consent");
+      return;
+    }
+
+    // 蜜罐：真实用户不会勾选这个隐藏字段，被勾选则当作机器人静默丢弃。
+    const botField = form.elements.namedItem("botcheck");
+    if (botField instanceof HTMLInputElement && botField.checked) {
+      setStatus("saved");
       return;
     }
 
@@ -58,6 +73,7 @@ export function WaitlistForm() {
 
       saveEmail(normalized);
       setEmail("");
+      setConsent(false);
       setStatus("saved");
     } catch {
       setStatus("failed");
@@ -83,8 +99,33 @@ export function WaitlistForm() {
           {status === "sending" ? "Sending" : "Join waitlist"}
         </button>
       </div>
+
+      {/* 蜜罐字段：视觉隐藏，仅机器人会填写。 */}
+      <input
+        type="checkbox"
+        name="botcheck"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        style={{ position: "absolute", left: "-9999px", opacity: 0 }}
+      />
+
+      <label className="consent-row">
+        <input
+          type="checkbox"
+          checked={consent}
+          onChange={(event) => setConsent(event.target.checked)}
+          disabled={status === "sending"}
+        />
+        <span>
+          I agree that my email is sent through Web3Forms so the site owner can contact me about the
+          Pro waitlist.
+        </span>
+      </label>
+
       <p className="form-status" aria-live="polite">
         {status === "invalid" ? "Enter a valid email address." : null}
+        {status === "consent" ? "Please agree before joining the waitlist." : null}
         {status === "sending" ? "Sending your signup..." : null}
         {status === "saved" ? "You are on the Pro waitlist." : null}
         {status === "failed" ? "Could not send. Please try again." : null}
