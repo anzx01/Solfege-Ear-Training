@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://solfege-ear-trainer.local"),
+  metadataBase: new URL("https://solfege-ear-training.vercel.app"),
   title: {
     default: "Movable Do Solfege Ear Training Online",
     template: "%s | Solfege Ear Trainer"

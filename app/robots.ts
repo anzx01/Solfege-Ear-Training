@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/"
     },
-    sitemap: "https://solfege-ear-trainer.local/sitemap.xml"
+    sitemap: "https://solfege-ear-training.vercel.app/sitemap.xml"
   };
 }
