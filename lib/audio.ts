@@ -44,9 +44,10 @@ function speedForDifficulty(difficulty: Difficulty): PlaybackSpeed {
   };
 }
 
-function playTone(
+function voice(
   context: AudioContext,
-  midi: number,
+  frequency: number,
+  type: OscillatorType,
   startAt: number,
   duration: number,
   volume: number
@@ -54,8 +55,8 @@ function playTone(
   const oscillator = context.createOscillator();
   const gain = context.createGain();
 
-  oscillator.type = "triangle";
-  oscillator.frequency.setValueAtTime(midiToFrequency(midi), startAt);
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, startAt);
 
   gain.gain.setValueAtTime(0.0001, startAt);
   gain.gain.exponentialRampToValueAtTime(volume, startAt + 0.025);
@@ -68,6 +69,20 @@ function playTone(
   oscillator.stop(startAt + duration + 0.05);
 }
 
+// 主音用三角波，叠加一个低增益的八度泛音(正弦)，让音色更饱满、更接近真实乐器。
+function playTone(
+  context: AudioContext,
+  midi: number,
+  startAt: number,
+  duration: number,
+  volume: number
+) {
+  const frequency = midiToFrequency(midi);
+  voice(context, frequency, "triangle", startAt, duration, volume);
+  voice(context, frequency * 2, "sine", startAt, duration, volume * 0.3);
+}
+
+// midis[0] 是低音根音，音量略突出以强化调性中心。
 function scheduleChord(
   context: AudioContext,
   midis: number[],
@@ -75,7 +90,8 @@ function scheduleChord(
   duration: number
 ) {
   midis.forEach((midi, index) => {
-    playTone(context, midi, startAt + index * 0.012, duration, 0.08);
+    const volume = index === 0 ? 0.1 : 0.07;
+    playTone(context, midi, startAt + index * 0.012, duration, volume);
   });
 }
 

@@ -1,7 +1,8 @@
-import { SOLFEGE, SOLFEGE_LABELS, type Exercise, type Solfege } from "@/lib/music";
+import { SOLFEGE_LABELS, type Exercise, type Solfege } from "@/lib/music";
 import type { Feedback } from "@/components/practice/types";
 
 type AnswerGridProps = {
+  options: Solfege[];
   exercise: Exercise | null;
   feedback: Feedback;
   hasResolvedQuestion: boolean;
@@ -10,21 +11,24 @@ type AnswerGridProps = {
 };
 
 export function AnswerGrid({
+  options,
   exercise,
   feedback,
   hasResolvedQuestion,
   isPlaying,
   onAnswer
 }: AnswerGridProps) {
+  const showWrong = feedback.state === "incorrect" || feedback.state === "retry";
+
   return (
     <div className="answer-grid" aria-label="Solfege answer choices">
-      {SOLFEGE.map((syllable) => {
+      {options.map((syllable) => {
         const isTarget = exercise?.target.syllable === syllable;
         const isChosen = feedback.chosen === syllable;
         const stateClass =
           hasResolvedQuestion && isTarget
             ? "is-target"
-            : feedback.state === "incorrect" && isChosen
+            : showWrong && isChosen
               ? "is-wrong"
               : "";
 

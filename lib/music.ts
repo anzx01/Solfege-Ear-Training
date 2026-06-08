@@ -160,14 +160,22 @@ export function sanitizeSettings(value: unknown): PracticeSettings {
   };
 }
 
+// 主音(do)居中锚定在 C4 附近，避免跨调时绝对音高漂移过大。
+function rootMidi(key: SupportedKey): number {
+  const pitchClass = KEY_PITCH_CLASS[key];
+  const centered = pitchClass <= 6 ? pitchClass : pitchClass - 12;
+  return 60 + centered;
+}
+
+// 音阶级数在主音上方的一个八度内自然上行（do 最低、ti 最高），
+// 保证同一唱名在所有调里保持一致的相对音高，这是 movable-do 练耳的根基。
 export function midiForSolfege(key: SupportedKey, syllable: Solfege): number {
-  const rootInFourthOctave = 60 + KEY_PITCH_CLASS[key];
-  let midi = rootInFourthOctave + DEGREE_INTERVALS[syllable];
+  return rootMidi(key) + DEGREE_INTERVALS[syllable];
+}
 
-  while (midi > 71) midi -= 12;
-  while (midi < 60) midi += 12;
-
-  return midi;
+// 目标音抬高一个八度(+12)，明显高于和弦体，避免被终止式余音淹没。
+export function midiForTarget(key: SupportedKey, syllable: Solfege): number {
+  return midiForSolfege(key, syllable) + 12;
 }
 
 export function midiToFrequency(midi: number): number {
@@ -186,16 +194,18 @@ export function getKeyForExercise(
   return SUPPORTED_KEYS[Math.min(index, SUPPORTED_KEYS.length - 1)];
 }
 
+const CHORD_TONES: Record<"I" | "IV" | "V", Solfege[]> = {
+  I: ["do", "mi", "sol"],
+  IV: ["fa", "la", "do"],
+  V: ["sol", "ti", "re"]
+};
+
+// 和弦根音落在和弦体下方一个八度，形成 do→sol→do 的低音线以确立调性。
 export function chordForFunction(key: SupportedKey, chord: "I" | "IV" | "V"): number[] {
-  if (chord === "IV") {
-    return ["fa", "la", "do"].map((syllable) => midiForSolfege(key, syllable as Solfege));
-  }
-
-  if (chord === "V") {
-    return ["sol", "ti", "re"].map((syllable) => midiForSolfege(key, syllable as Solfege));
-  }
-
-  return ["do", "mi", "sol"].map((syllable) => midiForSolfege(key, syllable as Solfege));
+  const tones = CHORD_TONES[chord];
+  const body = tones.map((syllable) => midiForSolfege(key, syllable));
+  const bass = midiForSolfege(key, tones[0]) - 12;
+  return [bass, ...body];
 }
 
 export function cadenceFunctions(cadence: Cadence): Array<"I" | "IV" | "V"> {
@@ -217,9 +227,9 @@ export function createExercise(
     target: {
       degree: DEGREE_NUMBERS[syllable],
       syllable,
-      midi: midiForSolfege(key, syllable)
+      midi: midiForTarget(key, syllable)
     },
-    options: [...SOLFEGE],
+    options: enabledDegrees,
     createdAt: new Date().toISOString()
   };
 }
