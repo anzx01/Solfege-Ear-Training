@@ -94,7 +94,7 @@ export function WaitlistForm() {
           name="email"
           disabled={status === "sending"}
         />
-        <button className="button primary" type="submit" disabled={status === "sending"}>
+        <button className="button primary" type="submit" disabled={status === "sending" || !consent}>
           <Mail size={18} aria-hidden="true" />
           {status === "sending" ? "Sending" : "Join waitlist"}
         </button>
@@ -125,6 +125,7 @@ export function WaitlistForm() {
 
       <p className="form-status" aria-live="polite">
         {status === "invalid" ? "Enter a valid email address." : null}
+        {status === "idle" && !consent ? "Please agree before joining the waitlist." : null}
         {status === "consent" ? "Please agree before joining the waitlist." : null}
         {status === "sending" ? "Sending your signup..." : null}
         {status === "saved" ? "You are on the Pro waitlist." : null}
