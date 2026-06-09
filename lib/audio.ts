@@ -150,7 +150,7 @@ export class SolfegeAudioEngine {
     const start = context.currentTime + 0.04;
     let cursor = start;
 
-    for (const chord of cadenceFunctions(settings.cadence as Cadence)) {
+    for (const chord of cadenceFunctions(settings.cadence)) {
       scheduleChord(context, chordForFunction(exercise.key, chord), cursor, speed.chordDuration);
       cursor += speed.chordSpacing;
     }

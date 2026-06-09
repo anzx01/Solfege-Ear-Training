@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { XCircle } from "lucide-react";
 import {
   SOLFEGE,
@@ -25,9 +26,57 @@ export function SettingsPanel({
   onToggleSyllable,
   onChange
 }: SettingsPanelProps) {
+  const dialogRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    // 打开时聚焦到关闭按钮
+    closeButtonRef.current?.focus();
+
+    // 保存触发按钮的引用（用于关闭后返回）
+    const previousActiveElement = document.activeElement as HTMLElement;
+
+    // Esc 键关闭
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    }
+
+    // 焦点 trap：Tab 循环在弹窗内
+    function handleFocusTrap(event: KeyboardEvent) {
+      if (event.key !== "Tab" || !dialogRef.current) return;
+
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstFocusable = focusable[0];
+      const lastFocusable = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === firstFocusable) {
+        event.preventDefault();
+        lastFocusable.focus();
+      } else if (!event.shiftKey && document.activeElement === lastFocusable) {
+        event.preventDefault();
+        firstFocusable.focus();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleFocusTrap);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keydown", handleFocusTrap);
+      // 关闭后返回触发按钮
+      previousActiveElement?.focus();
+    };
+  }, [onClose]);
+
   return (
     <div className="settings-backdrop" onClick={onClose}>
       <aside
+        ref={dialogRef}
         className="settings-panel"
         role="dialog"
         aria-modal="true"
@@ -36,7 +85,13 @@ export function SettingsPanel({
       >
         <div className="settings-header">
           <h2 id="settings-heading">Settings</h2>
-          <button className="button icon-button" type="button" onClick={onClose} aria-label="Close settings">
+          <button
+            ref={closeButtonRef}
+            className="button icon-button"
+            type="button"
+            onClick={onClose}
+            aria-label="Close settings"
+          >
             <XCircle size={19} aria-hidden="true" />
           </button>
         </div>

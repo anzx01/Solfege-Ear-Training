@@ -14,7 +14,7 @@ export function PracticeTrainer() {
   const statusIcon =
     feedback.state === "correct" ? (
       <CheckCircle2 size={22} aria-hidden="true" />
-    ) : feedback.state === "incorrect" || feedback.state === "retry" ? (
+    ) : feedback.state === "retry" ? (
       <XCircle size={22} aria-hidden="true" />
     ) : null;
 
@@ -48,7 +48,7 @@ export function PracticeTrainer() {
 
       <div className={`feedback-line ${feedbackClass}`} role="status" aria-live="polite">
         {statusIcon}
-        <span>{isPlaying ? "Playing" : feedback.message}</span>
+        <span>{isPlaying ? "Playing audio..." : feedback.message}</span>
       </div>
 
       <AnswerGrid

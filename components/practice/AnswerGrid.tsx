@@ -19,13 +19,14 @@ export function AnswerGrid({
   isPlaying,
   onAnswer
 }: AnswerGridProps) {
-  const showWrong = feedback.state === "incorrect" || feedback.state === "retry";
+  const showWrong = feedback.state === "retry";
 
   return (
     <div className="answer-grid" aria-label="Solfege answer choices">
-      {options.map((syllable) => {
+      {options.map((syllable, index) => {
         const isTarget = exercise?.target.syllable === syllable;
         const isChosen = feedback.chosen === syllable;
+        const shortcutKey = index + 1;
         // marker 让答对/答错不只靠颜色区分（无障碍：屏幕阅读器与色盲用户）。
         const marker =
           hasResolvedQuestion && isTarget
@@ -49,9 +50,15 @@ export function AnswerGrid({
             className={`answer-button ${stateClass}`}
             onClick={() => onAnswer(syllable)}
             disabled={Boolean(exercise) && (isPlaying || hasResolvedQuestion)}
-            aria-label={`Answer ${SOLFEGE_LABELS[syllable]}${statusLabel}`}
+            aria-label={`Answer ${SOLFEGE_LABELS[syllable]}${statusLabel}, shortcut ${shortcutKey}`}
+            title={`Press ${shortcutKey}`}
           >
-            <span>{SOLFEGE_LABELS[syllable]}</span>
+            <span className="answer-button-label">
+              <span className="answer-button-syllable">{SOLFEGE_LABELS[syllable]}</span>
+              <span className="answer-button-shortcut" aria-hidden="true">
+                {shortcutKey}
+              </span>
+            </span>
             {marker === "correct" ? (
               <Check size={16} aria-hidden="true" />
             ) : marker === "wrong" ? (

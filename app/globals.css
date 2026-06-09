@@ -360,6 +360,33 @@ h1 {
     border-color 150ms ease;
 }
 
+.answer-button-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.answer-button-syllable {
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.answer-button-shortcut {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid var(--line-medium);
+  border-radius: 4px;
+  background: var(--surface-soft);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  opacity: 0.6;
+}
+
 .answer-button:hover:not(:disabled) {
   transform: translateY(-2px);
   background: var(--surface-soft);
@@ -409,6 +436,99 @@ h1 {
   color: var(--ink);
   font-size: 1.35rem;
   font-weight: 900;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.stat-highlight {
+  color: var(--accent-dark);
+}
+
+.stat-goal {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stats-details {
+  border: 2px solid var(--line-medium);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 12px;
+}
+
+.stats-details summary {
+  cursor: pointer;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+  list-style: none;
+  padding: 4px 0;
+  user-select: none;
+}
+
+.stats-details summary::marker {
+  content: "";
+}
+
+.stats-details summary::before {
+  content: "▸ ";
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 150ms ease;
+}
+
+.stats-details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.syllable-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.syllable-stat-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 60px;
+  align-items: center;
+  gap: 12px;
+}
+
+.syllable-stat-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.syllable-stat-bar-container {
+  height: 20px;
+  border: 1px solid var(--line-medium);
+  border-radius: 4px;
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.syllable-stat-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-soft), var(--accent));
+  transition: width 300ms ease;
+  min-width: 2px;
+}
+
+.syllable-stat-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: right;
 }
 
 .settings-backdrop {
