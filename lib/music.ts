@@ -167,10 +167,24 @@ function rootMidi(key: SupportedKey): number {
   return 60 + centered;
 }
 
+function normalizeToPracticeRange(midi: number): number {
+  let normalized = midi;
+
+  while (normalized < 60) {
+    normalized += 12;
+  }
+
+  while (normalized > 71) {
+    normalized -= 12;
+  }
+
+  return normalized;
+}
+
 // 音阶级数在主音上方的一个八度内自然上行（do 最低、ti 最高），
 // 保证同一唱名在所有调里保持一致的相对音高，这是 movable-do 练耳的根基。
 export function midiForSolfege(key: SupportedKey, syllable: Solfege): number {
-  return rootMidi(key) + DEGREE_INTERVALS[syllable];
+  return normalizeToPracticeRange(rootMidi(key) + DEGREE_INTERVALS[syllable]);
 }
 
 // 目标音抬高一个八度(+12)，明显高于和弦体，避免被终止式余音淹没。
