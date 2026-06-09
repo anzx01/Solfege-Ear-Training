@@ -59,6 +59,10 @@ export function WaitlistForm() {
     setStatus("sending");
 
     try {
+      if (!WEB3FORMS_ACCESS_KEY) {
+        throw new Error("Web3Forms access key is not configured.");
+      }
+
       const payload = new FormData();
       payload.append("access_key", WEB3FORMS_ACCESS_KEY);
       payload.append("subject", "New Solfege Ear Trainer Pro waitlist signup");
