@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { VisitCounter } from "@/components/VisitCounter";
 
 export function Footer() {
   return (
@@ -6,6 +7,7 @@ export function Footer() {
       <div>
         <strong>Solfege Ear Trainer</strong>
         <p>Free movable-do practice in the browser.</p>
+        <VisitCounter />
       </div>
       <nav aria-label="Footer navigation">
         <Link href="/privacy">Privacy</Link>

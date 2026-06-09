@@ -652,6 +652,32 @@ select:disabled {
   margin: 4px 0 0;
 }
 
+.site-footer .visit-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.site-footer .visit-counter div {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.site-footer .visit-counter dt {
+  font-weight: 800;
+}
+
+.site-footer .visit-counter dd {
+  margin: 0;
+  color: var(--accent-dark);
+  font-size: 1rem;
+  font-weight: 950;
+}
+
 .simple-page {
   padding: 42px 0 70px;
 }
