@@ -5,8 +5,7 @@ import { Mail } from "lucide-react";
 
 const WAITLIST_KEY = "solfege.pro.waitlist.v1";
 const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
-const WEB3FORMS_ACCESS_KEY =
-  process.env.NEXT_PUBLIC_WEB3FORMS_KEY ?? "566f89c1-80c0-4fd7-97ea-f2c9aa4694fe";
+const WEB3FORMS_ACCESS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY;
 
 type SubmitStatus = "idle" | "invalid" | "consent" | "sending" | "saved" | "failed";
 
@@ -26,8 +25,17 @@ export function WaitlistForm() {
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<SubmitStatus>("idle");
 
+  // 如果没有配置 Web3Forms key，禁用表单
+  const isConfigured = Boolean(WEB3FORMS_ACCESS_KEY);
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (!isConfigured) {
+      setStatus("failed");
+      return;
+    }
+
     const form = event.currentTarget;
     const normalized = email.trim().toLowerCase();
 
@@ -92,9 +100,13 @@ export function WaitlistForm() {
           placeholder="you@example.com"
           autoComplete="email"
           name="email"
-          disabled={status === "sending"}
+          disabled={status === "sending" || !isConfigured}
         />
-        <button className="button primary" type="submit" disabled={status === "sending" || !consent}>
+        <button
+          className="button primary"
+          type="submit"
+          disabled={status === "sending" || !consent || !isConfigured}
+        >
           <Mail size={18} aria-hidden="true" />
           {status === "sending" ? "Sending" : "Join waitlist"}
         </button>
@@ -115,7 +127,7 @@ export function WaitlistForm() {
           type="checkbox"
           checked={consent}
           onChange={(event) => setConsent(event.target.checked)}
-          disabled={status === "sending"}
+          disabled={status === "sending" || !isConfigured}
         />
         <span>
           I agree that my email is sent through Web3Forms so the site owner can contact me about the
@@ -124,6 +136,7 @@ export function WaitlistForm() {
       </label>
 
       <p className="form-status" aria-live="polite">
+        {!isConfigured ? "Waitlist form is not configured." : null}
         {status === "invalid" ? "Enter a valid email address." : null}
         {status === "idle" && !consent ? "Please agree before joining the waitlist." : null}
         {status === "consent" ? "Please agree before joining the waitlist." : null}

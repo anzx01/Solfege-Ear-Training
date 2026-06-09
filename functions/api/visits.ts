@@ -1,21 +1,35 @@
+type Env = {
+  VISIT_COUNTER: KVNamespace;
+};
+
+type VisitResponse = {
+  today: number;
+  total: number;
+  date: string;
+};
+
+type ErrorResponse = {
+  error: string;
+};
+
 const TOTAL_KEY = "site:visits:total";
 const LEGACY_TOTAL_KEY = "site:visits";
 const DAY_IN_SECONDS = 24 * 60 * 60;
 
-function getShanghaiDateKey(now = new Date()) {
+function getShanghaiDateKey(now = new Date()): string {
   return new Date(now.getTime() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10);
 }
 
-function getDailyKey(dateKey) {
+function getDailyKey(dateKey: string): string {
   return `site:visits:daily:${dateKey}`;
 }
 
-function parseCount(rawCount) {
+function parseCount(rawCount: string | null): number {
   const parsedCount = Number.parseInt(rawCount ?? "0", 10);
   return Number.isFinite(parsedCount) && parsedCount >= 0 ? parsedCount : 0;
 }
 
-function json(body, status = 200) {
+function json<T>(body: T, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
@@ -25,9 +39,15 @@ function json(body, status = 200) {
   });
 }
 
-async function handleVisitRequest(env, shouldIncrement) {
+async function handleVisitRequest(
+  env: Env,
+  shouldIncrement: boolean
+): Promise<Response> {
   if (!env.VISIT_COUNTER) {
-    return json({ error: "VISIT_COUNTER binding is not configured." }, 501);
+    return json<ErrorResponse>(
+      { error: "VISIT_COUNTER binding is not configured." },
+      501
+    );
   }
 
   const date = getShanghaiDateKey();
@@ -50,13 +70,13 @@ async function handleVisitRequest(env, shouldIncrement) {
     ]);
   }
 
-  return json({ today, total, date });
+  return json<VisitResponse>({ today, total, date });
 }
 
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ env }: { env: Env }): Promise<Response> {
   return handleVisitRequest(env, false);
 }
 
-export async function onRequestPost({ env }) {
+export async function onRequestPost({ env }: { env: Env }): Promise<Response> {
   return handleVisitRequest(env, true);
 }
