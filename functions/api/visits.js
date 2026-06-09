@@ -1,6 +1,6 @@
 const TOTAL_KEY = "site:visits:total";
 const LEGACY_TOTAL_KEY = "site:visits";
-const DAY_IN_MS = 24 * 60 * 60 * 1000;
+const DAY_IN_SECONDS = 24 * 60 * 60;
 
 function getShanghaiDateKey(now = new Date()) {
   return new Date(now.getTime() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -46,7 +46,7 @@ async function handleVisitRequest(env, shouldIncrement) {
   if (shouldIncrement) {
     await Promise.all([
       env.VISIT_COUNTER.put(TOTAL_KEY, String(total)),
-      env.VISIT_COUNTER.put(dailyKey, String(today), { expirationTtl: 90 * DAY_IN_MS })
+      env.VISIT_COUNTER.put(dailyKey, String(today), { expirationTtl: 90 * DAY_IN_SECONDS })
     ]);
   }
 
