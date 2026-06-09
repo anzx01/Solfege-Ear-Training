@@ -1,3 +1,4 @@
+import { Check, X } from "lucide-react";
 import { SOLFEGE_LABELS, type Exercise, type Solfege } from "@/lib/music";
 import type { Feedback } from "@/components/practice/types";
 
@@ -25,11 +26,20 @@ export function AnswerGrid({
       {options.map((syllable) => {
         const isTarget = exercise?.target.syllable === syllable;
         const isChosen = feedback.chosen === syllable;
-        const stateClass =
+        // marker 让答对/答错不只靠颜色区分（无障碍：屏幕阅读器与色盲用户）。
+        const marker =
           hasResolvedQuestion && isTarget
-            ? "is-target"
+            ? "correct"
             : showWrong && isChosen
-              ? "is-wrong"
+              ? "wrong"
+              : null;
+        const stateClass =
+          marker === "correct" ? "is-target" : marker === "wrong" ? "is-wrong" : "";
+        const statusLabel =
+          marker === "correct"
+            ? ", correct answer"
+            : marker === "wrong"
+              ? ", incorrect choice"
               : "";
 
         return (
@@ -39,9 +49,14 @@ export function AnswerGrid({
             className={`answer-button ${stateClass}`}
             onClick={() => onAnswer(syllable)}
             disabled={Boolean(exercise) && (isPlaying || hasResolvedQuestion)}
-            aria-label={`Answer ${SOLFEGE_LABELS[syllable]}`}
+            aria-label={`Answer ${SOLFEGE_LABELS[syllable]}${statusLabel}`}
           >
             <span>{SOLFEGE_LABELS[syllable]}</span>
+            {marker === "correct" ? (
+              <Check size={16} aria-hidden="true" />
+            ) : marker === "wrong" ? (
+              <X size={16} aria-hidden="true" />
+            ) : null}
           </button>
         );
       })}
